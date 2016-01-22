@@ -32,6 +32,7 @@ public class SecMem {
     }
 
     public void initBAT(int size){
+//        System.out.println("Initialising SecMem");
         buckAddressTable=new ArrayList<Integer>();
         for (int i = 0; i < size; i++) {
             buckAddressTable.add(-1);
@@ -40,6 +41,7 @@ public class SecMem {
 
     public void resizeBAT(int GD){
         long toAdd= (long) (Math.pow(2,GD)-(CommonUtils.dirSize+buckAddressTable.size()));
+//        System.out.println("Resizing SecMem: "+Math.pow(2,GD));
         for (int i = 0;i< toAdd;i++){
             buckAddressTable.add(-1);
         }

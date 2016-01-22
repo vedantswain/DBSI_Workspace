@@ -79,7 +79,7 @@ public class Bucket {
         this.index=0;
 //        System.out.println("Values in collision bucket:");
         for(int i=0;i<finalRecords.length;i++){
-            System.out.print(finalRecords[i]+", ");
+//            System.out.print(finalRecords[i]+", ");
         }
         System.out.println();
 
@@ -94,7 +94,7 @@ public class Bucket {
 
 
     public void chainRecord(int record){
-        System.out.println("Chaining: "+record);
+//        System.out.println("Chaining: "+record);
         if((!overflowBucks.isEmpty()) && (overflowBucks.get(overflowBucks.size()-1).getIndex()<CommonUtils.buckLength)){
             overflowBucks.get(overflowBucks.size()-1).insertRecord(record);
         }
