@@ -17,17 +17,20 @@ public class ExtHash {
     static MainMem mainMem=new MainMem();
     static SecMem secMem=new SecMem();
 
+    public static int log2(int n)
+    {
+        return (int)(Math.ceil(Math.log(n) / Math.log(2)));
+    }
+
     public static int getMSB(int val){
         BigInteger v = BigInteger.valueOf(val);
-        BigInteger msbV;
-        if(v.bitLength() - mainMem.getGlobalDepth()>0) {
-            msbV = v.shiftRight(v.bitLength() - mainMem.getGlobalDepth());
-        }
-        else {
-            msbV = v;
-        }
+        int padding=log2(800000);
+        String byteString = String.format("%0"+padding+"d",Integer.parseInt(v.toString(2)));
+        String prefix=byteString.substring(0,mainMem.getGlobalDepth());
 //        System.out.println("For Val: "+val+" Index: "+msbV.intValue());
-        return msbV.intValue();
+        if(prefix.equals(""))
+            return 0;
+        return Integer.parseInt(prefix, 2);
     }
 
     public static String getPrefix(int val,int depth){
@@ -204,7 +207,7 @@ public class ExtHash {
         }
     }
 
-    public static boolean searchVal(int val){
+    public static int searchVal(int val){
         int index=getMSB(val);
         int buckAddress;
         if(index<CommonUtils.dirSize) {
@@ -216,7 +219,7 @@ public class ExtHash {
 //        System.out.println("Searching in Bucket: "+buckAddress);
         Bucket searchBuck=secMem.getBucketAt(buckAddress);
         if(searchBuck==null) {
-            return false;
+            return 0;
         }
         return searchBuck.searchRecord(val);
     }

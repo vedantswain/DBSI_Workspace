@@ -119,21 +119,27 @@ public class Bucket {
 
     }
 
-    public boolean searchRecord(int record){
-        for(int i=0;i<this.index;i++){
-            if(this.records[i]==record)
-                return true;
+    public int searchRecord(int record){
+        int searchCost=1;
+        for(int i=0;i<this.records.length;i++){
+//            System.out.println("checking record: "+this.records[i]);
+            if(this.records[i]==record) {
+                return searchCost;
+            }
         }
 
-        if(index>=CommonUtils.buckLength){
+        if(overflowBucks.size()>0){
             for (int i=0;i<overflowBucks.size();i++){
                 Bucket ofBuck=overflowBucks.get(i);
-                for(int j=0;j<ofBuck.getIndex();j++){
-                    if(ofBuck.getRecords()[i]==record)
-                        return true;
+                searchCost++;
+//                System.out.println("checking overflow bucket: "+i);
+                for(int j=0;j<ofBuck.getRecords().length;j++){
+//                    System.out.println("checking record: "+ofBuck.getRecords()[j]);
+                    if(ofBuck.getRecords()[j]==record)
+                        return searchCost;
                 }
             }
         }
-        return false;
+        return 0;
     }
 }

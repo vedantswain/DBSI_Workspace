@@ -8,21 +8,24 @@ public class launcher {
 
     public static void main(String[] args){
         CommonUtils.setBuckLength(2);
+
+//        System.out.println(ExtHash.getMSB(2));
+//        System.out.println(ExtHash.getMSB(1));
+//        System.out.println(ExtHash.getMSB(3));
+//        System.out.println(ExtHash.getMSB(5));
+
         ExtHash.insert(2);
         ExtHash.insert(2);
         ExtHash.insert(3);
         ExtHash.insert(1);
         ExtHash.insert(1);
 
-        ExtHash.printBAT();
+//        ExtHash.printBAT();
 //        secMem.printMap();
 //
 //        System.out.println("Total Buckets: "+getBucketCount());
 
-//        System.out.println(searchVal(2));
-//        System.out.println(searchVal(3));
-//        System.out.println(searchVal(1));
-//        System.out.println(searchVal(0));
+        System.out.println(ExtHash.searchVal(0));
 
 //        secMem.printMap();
 
