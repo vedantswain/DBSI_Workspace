@@ -1,8 +1,8 @@
-package main;
+package EH;
 
-import objects.Bucket;
-import objects.MainMem;
-import objects.SecMem;
+import EH.objects.Bucket;
+import EH.objects.MainMem;
+import EH.objects.SecMem;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -11,10 +11,9 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * Created by vedantdasswain on 19/01/16.
+ * Created by vedantdasswain on 22/01/16.
  */
-public class launcher {
-
+public class ExtHash {
     static MainMem mainMem=new MainMem();
     static SecMem secMem=new SecMem();
 
@@ -39,10 +38,10 @@ public class launcher {
     }
 
 
-    public static void redist(Bucket usedBuck,int val,boolean splitOnce){
+    public static void redist(Bucket usedBuck, int val, boolean splitOnce){
         mainMem.setGlobalDepth(mainMem.getGlobalDepth()+1);
         System.out.println("GD: "+mainMem.getGlobalDepth());
-        if(mainMem.getIndex()>=CommonUtils.dirSize) {
+        if(mainMem.getIndex()>= CommonUtils.dirSize) {
             secMem.resizeBAT(mainMem.getGlobalDepth());
         }
         int[] oldRecords=usedBuck.popBuck();
@@ -234,31 +233,7 @@ public class launcher {
         return N;
     }
 
-    public static void main(String[] args){
-        CommonUtils.setBuckLength(2);
-        insertVal(2,false);
-        insertVal(2,false);
-        insertVal(3,false);
-        insertVal(1,false);
-        insertVal(1,false);
-//        insertVal(7,false);
-//        insertVal(0);
-//        insertVal(0);
-//        insertVal(0);
-//        insertVal(2);
-//        insertVal(1);
-
-//        printBAT();
-//        secMem.printMap();
-//
-//        System.out.println("Total Buckets: "+getBucketCount());
-
-        System.out.println(searchVal(2));
-        System.out.println(searchVal(3));
-        System.out.println(searchVal(1));
-        System.out.println(searchVal(0));
-
-//        secMem.printMap();
-
+    public static void insert(int val){
+        insertVal(val,false);
     }
 }

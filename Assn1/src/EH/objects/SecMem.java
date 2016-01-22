@@ -1,6 +1,6 @@
-package objects;
+package EH.objects;
 
-import main.CommonUtils;
+import EH.CommonUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;

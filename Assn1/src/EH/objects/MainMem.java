@@ -1,6 +1,6 @@
-package objects;
+package EH.objects;
 
-import main.CommonUtils;
+import EH.CommonUtils;
 
 /**
  * Created by vedantdasswain on 19/01/16.
