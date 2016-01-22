@@ -47,7 +47,7 @@ public class launcher {
         }
         int[] oldRecords=usedBuck.popBuck();
         for(int i=0;i<oldRecords.length;i++){
-            System.out.println("Inserting Old: "+oldRecords[i]);
+//            System.out.println("Inserting Old: "+oldRecords[i]);
             insertVal(oldRecords[i],splitOnce);
         }
         insertVal(val,splitOnce);
@@ -214,7 +214,11 @@ public class launcher {
         else{
             buckAddress=secMem.getBucketAddressAt(index);
         }
+//        System.out.println("Searching in Bucket: "+buckAddress);
         Bucket searchBuck=secMem.getBucketAt(buckAddress);
+        if(searchBuck==null) {
+            return false;
+        }
         return searchBuck.searchRecord(val);
     }
 
@@ -225,7 +229,7 @@ public class launcher {
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
             N+=((Bucket)pair.getValue()).getCount();
-            it.remove(); // avoids a ConcurrentModificationException
+//            it.remove(); // avoids a ConcurrentModificationException
         }
         return N;
     }
@@ -244,14 +248,17 @@ public class launcher {
 //        insertVal(2);
 //        insertVal(1);
 
-        printBAT();
+//        printBAT();
+//        secMem.printMap();
+//
+//        System.out.println("Total Buckets: "+getBucketCount());
 
-        System.out.println("Total Buckets: "+getBucketCount());
+        System.out.println(searchVal(2));
+        System.out.println(searchVal(3));
+        System.out.println(searchVal(1));
+        System.out.println(searchVal(0));
 
-//        System.out.println(searchVal(2));
-//        System.out.println(searchVal(3));
-//        System.out.println(searchVal(1));
-//        System.out.println(searchVal(0));
+//        secMem.printMap();
 
     }
 }

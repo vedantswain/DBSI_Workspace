@@ -77,7 +77,7 @@ public class Bucket {
             records[i]=-1;
         }
         this.index=0;
-        System.out.println("Values in collision bucket:");
+//        System.out.println("Values in collision bucket:");
         for(int i=0;i<finalRecords.length;i++){
             System.out.print(finalRecords[i]+", ");
         }

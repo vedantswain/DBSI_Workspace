@@ -4,6 +4,8 @@ import main.CommonUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Created by vedantdasswain on 19/01/16.
@@ -69,5 +71,18 @@ public class SecMem {
 
     public void deleteBucketAt(int key){
         bucketMap.remove(bucketMap.get(key));
+    }
+
+    public void printMap() {
+        Map mp=this.bucketMap;
+        Iterator it = mp.entrySet().iterator();
+        if(!it.hasNext()){
+            System.out.println("No buckets");
+        }
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry)it.next();
+            System.out.println("Bucket key "+pair.getKey() + " - CurrentInd: " + ((Bucket)pair.getValue()).getIndex());
+//            it.remove(); // avoids a ConcurrentModificationException
+        }
     }
 }

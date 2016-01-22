@@ -5,7 +5,7 @@ package main;
  */
 public class CommonUtils {
     public static int buckLength;
-    public static int dirSize=2;
+    public static int dirSize=1024;
 
     public static void setBuckLength(int buckLength) {
         CommonUtils.buckLength = buckLength;
