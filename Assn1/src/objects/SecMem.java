@@ -44,7 +44,7 @@ public class SecMem {
     }
 
     public void insertAddress(int address,int i){
-        i= CommonUtils.dirSize-i;
+        i= i-CommonUtils.dirSize;
         buckAddressTable.add(i,address);
         index++;
     }
@@ -54,7 +54,7 @@ public class SecMem {
     }
 
     public int getBucketAddressAt(int i){
-        i=CommonUtils.dirSize-i;
+        i=i-CommonUtils.dirSize;
         return buckAddressTable.get(i);
     }
 

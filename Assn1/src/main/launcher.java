@@ -27,6 +27,7 @@ public class launcher {
         else {
             msbV = v;
         }
+//        System.out.println("For Val: "+val+" Index: "+msbV.intValue());
         return msbV.intValue();
     }
 
@@ -121,6 +122,7 @@ public class launcher {
     }
 
     public static void insertToSec(int val,int index,boolean splitOnce){
+//        System.out.println("Inserting in Sec at Index: "+index);
         if(secMem.getBuckAddressTable()==null){
             secMem.initBAT(2*CommonUtils.dirSize);
         }
@@ -146,6 +148,7 @@ public class launcher {
             Bucket newBuck=new Bucket(mainMem.getGlobalDepth());
             newBuck.insertRecord(val);
             int address=secMem.putBucket(index,newBuck);
+            System.out.println("Inserting Address: "+address+" in Sec Mem at: "+index);
             secMem.insertAddress(address,index);
         }
     }
@@ -192,13 +195,13 @@ public class launcher {
     public static void printBAT(){
         System.out.println("Addresses:-");
         int[] BAT=mainMem.getBuckAddressTable();
-        int[] secBAT=mainMem.getBuckAddressTable();
+        ArrayList<Integer> secBAT=secMem.getBuckAddressTable();
         for(int i=0;i<mainMem.getIndex();i++){
             System.out.println("Ind: "+i+" Addr: "+BAT[i]);
         }
         for(int i=0;i<secMem.getIndex();i++){
             int j=CommonUtils.dirSize+i;
-            System.out.println("Ind: "+j+" Addr: "+BAT[i]);
+            System.out.println("Ind: "+j+" Addr: "+secBAT.get(i));
         }
     }
 
@@ -234,6 +237,7 @@ public class launcher {
         insertVal(3,false);
         insertVal(1,false);
         insertVal(1,false);
+//        insertVal(7,false);
 //        insertVal(0);
 //        insertVal(0);
 //        insertVal(0);
