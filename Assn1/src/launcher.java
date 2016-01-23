@@ -25,7 +25,7 @@ public class launcher {
 
         Random rand=new Random();
 
-        for(int i=0;i<100000;i++){
+        for(int i=0;i<50000;i++){
             int randint=rand.nextInt(800000);
             System.out.println("Inserting: "+randint+" | Record No. "+i);
             try {

@@ -137,7 +137,7 @@ public class ExtHash {
 
         int newAddress=secMem.putBucket(midX,newBuck);
 
-        if(midX>CommonUtils.dirSize)
+        if(midX>=CommonUtils.dirSize)
             secMem.insertAddress(newAddress,midX);
         else
             mainMem.insertAddress(newAddress,midX);
@@ -223,6 +223,7 @@ public class ExtHash {
         for(int i=0;i<secBAT.size();i++) {
             if((int)secBAT.get(i)==-1 || secMemRepointed[i])
                 continue;
+            secMemRepointed[i]=true;
             int ld = secMem.getBucketAt((int) secBAT.get(i)).getLocalDepth();
             String prefix = getPrefix(CommonUtils.dirSize+i, ld);
 //            System.out.println("Checking for "+prefix);
