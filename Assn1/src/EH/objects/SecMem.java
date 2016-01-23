@@ -41,9 +41,9 @@ public class SecMem {
 
     public void resizeBAT(int GD){
         long toAdd= (long) (Math.pow(2,GD)-(CommonUtils.dirSize+buckAddressTable.size()));
-//        System.out.println("Resizing SecMem: "+Math.pow(2,GD));
         int oldSize=buckAddressTable.size();
-        for (int i = oldSize;i< toAdd;i++){
+//        System.out.println("Resizing SecMem: "+Math.pow(2,GD)+" Current Size: "+oldSize+" toAdd: "+toAdd);
+        for (int i = 0;i< toAdd;i++){
             buckAddressTable.add(-1);
         }
     }
