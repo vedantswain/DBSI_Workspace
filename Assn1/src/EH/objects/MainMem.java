@@ -48,4 +48,7 @@ public class MainMem {
         index++;
     }
 
+    public void insertAddress(int newAddress, int midX) {
+        buckAddressTable[midX]=newAddress;
+    }
 }

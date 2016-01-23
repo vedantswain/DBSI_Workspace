@@ -42,14 +42,15 @@ public class SecMem {
     public void resizeBAT(int GD){
         long toAdd= (long) (Math.pow(2,GD)-(CommonUtils.dirSize+buckAddressTable.size()));
 //        System.out.println("Resizing SecMem: "+Math.pow(2,GD));
-        for (int i = 0;i< toAdd;i++){
+        int oldSize=buckAddressTable.size();
+        for (int i = oldSize;i< toAdd;i++){
             buckAddressTable.add(-1);
         }
     }
 
     public void insertAddress(int address,int i){
         i= i-CommonUtils.dirSize;
-        buckAddressTable.add(i,address);
+        buckAddressTable.set(i,address);
         index++;
     }
 
