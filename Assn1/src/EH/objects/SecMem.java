@@ -48,7 +48,7 @@ public class SecMem {
         }
     }
 
-    public void insertAddress(int address,int i){
+    public void insertAddress(int i,int address){
         i= i-CommonUtils.dirSize;
         buckAddressTable.set(i,address);
         index++;

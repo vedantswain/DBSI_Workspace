@@ -9,7 +9,9 @@ import java.util.Random;
 public class launcher {
 
     public static void main(String[] args){
+//        CommonUtils.setBuckLength(2);
         CommonUtils.setBuckLength(40);
+
 
 //        System.out.println(ExtHash.getMSB(2));
 //        System.out.println(ExtHash.getMSB(1));
@@ -20,12 +22,13 @@ public class launcher {
 //        ExtHash.insert(0);
 //        ExtHash.insert(4);
 //        ExtHash.insert(5);
-//        ExtHash.insert(2);
+//        ExtHash.insert(5);
 //        ExtHash.insert(3);
+//        ExtHash.insert(1);
 
         Random rand=new Random();
 
-        for(int i=0;i<50000;i++){
+        for(int i=0;i<1000;i++){
             int randint=rand.nextInt(800000);
             System.out.println("Inserting: "+randint+" | Record No. "+i);
             try {

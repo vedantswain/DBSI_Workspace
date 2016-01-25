@@ -24,6 +24,7 @@ public class ExtHash {
 
     public static int getMSB(int val){
         BigInteger v = BigInteger.valueOf(val);
+//        int padding=log2(8);
         int padding=log2(800000);
         String byteString = String.format("%0"+padding+"d",new BigInteger(v.toString(2)));
         String prefix=byteString.substring(0,mainMem.getGlobalDepth());
@@ -41,26 +42,6 @@ public class ExtHash {
     }
 
 
-    public static void redist(Bucket usedBuck, int val, boolean splitOnce){
-        mainMem.setGlobalDepth(mainMem.getGlobalDepth()+1);
-        System.out.println("GD: "+mainMem.getGlobalDepth());
-        if(mainMem.getGlobalDepth()>10) {
-//            System.out.println("Secondary Memory Opening");
-            if(secMem.getBuckAddressTable()==null){
-                secMem.initBAT(CommonUtils.dirSize);
-            }
-            else {
-                secMem.resizeBAT(mainMem.getGlobalDepth());
-            }
-        }
-        int[] oldRecords=usedBuck.popBuck();
-        for(int i=0;i<oldRecords.length;i++){
-//            System.out.println("Inserting Old: "+oldRecords[i]);
-            insertVal(oldRecords[i],splitOnce);
-        }
-        insertVal(val,splitOnce);
-    }
-
     public static int getManytoOneCount(int address){
         int[] BAT=mainMem.getBuckAddressTable();
         ArrayList secBAT=secMem.getBuckAddressTable();
@@ -70,16 +51,20 @@ public class ExtHash {
         int countPtr=0;
 
         for(int i=0;i<mainMemLength;i++){
-            if(BAT[i]==address)
+//            System.out.println(BAT[i]+" v/s "+address);
+            if(BAT[i]==address) {
                 countPtr++;
+            }
         }
 
         for(int i=0;i<secBAT.size();i++)
         {
+//            System.out.println((int)secBAT.get(i)+" v/s "+address);
             if((int)secBAT.get(i)==address)
                 countPtr++;
         }
 
+//        System.out.println("Final "+countPtr);
         return countPtr;
     }
 
@@ -90,13 +75,13 @@ public class ExtHash {
         int[] BAT=mainMem.getBuckAddressTable();
         ArrayList secBAT=secMem.getBuckAddressTable();
 
-//        System.out.println("MainMem Length "+mainMemLength);
+//        System.out.println("CountPtr "+countPtr);
         int i=0;
         while (countPtr>0 && i<mainMemLength){
             if(BAT[i]==address)
                 countPtr--;
             if(countPtr==midPtr){
-                return i;
+                return i+1;
             }
             i++;
         }
@@ -106,7 +91,7 @@ public class ExtHash {
             if((int)secBAT.get(i)==address)
                 countPtr--;
             if(countPtr==midPtr){
-                return i+CommonUtils.dirSize;
+                return i+1+CommonUtils.dirSize;
             }
             i++;
         }
@@ -124,9 +109,7 @@ public class ExtHash {
         else
             address=secMem.getBucketAddressAt(index);
 
-//        System.out.println("Bucket to be only split is: "+address);
-
-//        System.out.println("Pointers to address: "+getManytoOneCount(address));
+//        System.out.println("Bucket to be only split is: "+address+" Pointers to address: "+getManytoOneCount(address));
 
         usedBuck.setLocalDepth(usedBuck.getLocalDepth()+1); //Original Bucket
         Bucket newBuck=new Bucket(usedBuck.getLocalDepth()); //New Bucket
@@ -137,13 +120,13 @@ public class ExtHash {
 
         int newAddress=secMem.putBucket(midX,newBuck);
 
-        if(midX>=CommonUtils.dirSize)
-            secMem.insertAddress(newAddress,midX);
-        else
-            mainMem.insertAddress(newAddress,midX);
+//        System.out.println("MidX: "+midX);
 
-        int[] BAT=mainMem.getBuckAddressTable();
-        ArrayList secBAT=secMem.getBuckAddressTable();
+
+        if(midX>=CommonUtils.dirSize)
+            secMem.insertAddress(midX,newAddress);
+        else
+            mainMem.insertAddress(midX,newAddress);
 
         int mainMemLength= mainMem.getGlobalDepth()<=10? (int) Math.pow(2, mainMem.getGlobalDepth()) :CommonUtils.dirSize;
 
@@ -151,15 +134,15 @@ public class ExtHash {
         int X=midX;
         if(midX<CommonUtils.dirSize){
             for(int i=midX;i<mainMemLength;i++){
-                if(BAT[i]==address)
-                    BAT[i]=newAddress;
+                if(mainMem.getBucketAddressAt(i)==address)
+                    mainMem.insertAddress(i,newAddress);
             }
-            X=0;
+            X=midX;
         }
-        for(int i=X;i<secBAT.size();i++)
+        for(int i=mainMemLength+1;i<secMem.getBuckAddressTable().size();i++)
         {
-            if((int)secBAT.get(i)==address)
-                secBAT.set(i,newAddress);
+            if(secMem.getBucketAddressAt(i)==address)
+                secMem.insertAddress(i,newAddress);
         }
 
         //Reinserting values in old bucket across both buckets
@@ -172,97 +155,52 @@ public class ExtHash {
         insertVal(val,splitOnce);
     }
 
+    public static int getMatchAddress(int index){
+        if(index/2<CommonUtils.dirSize)
+            return mainMem.getBucketAddressAt(index/2);
+        else
+            return secMem.getBucketAddressAt(index/2);
+    }
 
-    public static void repoint(){
-        int[] BAT=mainMem.getBuckAddressTable();
-        ArrayList secBAT=secMem.getBuckAddressTable();
+    public static void resize(){
+        mainMem.setGlobalDepth(mainMem.getGlobalDepth()+1);
         int mainMemLength= mainMem.getGlobalDepth()<=10? (int) Math.pow(2, mainMem.getGlobalDepth()) :CommonUtils.dirSize;
+        System.out.println("GD: "+mainMem.getGlobalDepth());
 
-        //For skipping already repointed addresses
-        boolean[] mainMemRepointed=new boolean[CommonUtils.dirSize];
-        boolean[] secMemRepointed=new boolean[secBAT.size()];
-
-        //Traverses BAT through MainMem
-        for(int i=0;i<mainMemLength;i++){
-            if(BAT[i]<0 || mainMemRepointed[i])
-                continue;
-            mainMemRepointed[i]=true;
-            int ld=secMem.getBucketAt(BAT[i]).getLocalDepth();
-            String prefix=getPrefix(i,ld);
-//            System.out.println("Checking for "+prefix);
-            for(int j=0;j<mainMemLength;j++){
-                if(mainMemRepointed[j])
-                    continue;
-                Bucket checkBuck=secMem.getBucketAt(BAT[j]);
-                if(checkBuck==null || checkBuck.isEmpty()){
-                    if(prefix.equals(getPrefix(j,ld))){
-                        secMem.deleteBucketAt(BAT[j]);
-                        BAT[j]=BAT[i];
-                        mainMemRepointed[j]=true;
-//                        System.out.println("Repointing: Main "+j+" ->"+" Main "+i);
-                    }
-                }
+        if(mainMem.getGlobalDepth()>10) {
+//            System.out.println("Secondary Memory Opening");
+            if(secMem.getBuckAddressTable()==null){
+                secMem.initBAT(CommonUtils.dirSize);
             }
-
-            for(int j=0;j<secBAT.size();j++){
-                if(secMemRepointed[j])
-                    continue;
-                Bucket checkBuck=secMem.getBucketAt((int)secBAT.get(j));
-                if(checkBuck==null || checkBuck.isEmpty()){
-                    if(prefix.equals(getPrefix(j,ld))){
-                        secMem.deleteBucketAt((int)secBAT.get(j));
-                        secBAT.set(j,BAT[i]);
-                        secMemRepointed[j]=true;
-//                        System.out.println("Repointing: Sec "+(CommonUtils.dirSize+j)+" ->"+" Main "+i);
-                    }
-                }
+            else {
+                secMem.resizeBAT(mainMem.getGlobalDepth());
             }
         }
 
-        //Traverses BAT through SecMem
-        for(int i=0;i<secBAT.size();i++) {
-            if((int)secBAT.get(i)==-1 || secMemRepointed[i])
-                continue;
-            secMemRepointed[i]=true;
-            int ld = secMem.getBucketAt((int) secBAT.get(i)).getLocalDepth();
-            String prefix = getPrefix(CommonUtils.dirSize+i, ld);
-//            System.out.println("Checking for "+prefix);
-            for (int j = 0; j < mainMemLength; j++) {
-                if(mainMemRepointed[j])
-                    continue;
-                Bucket checkBuck = secMem.getBucketAt(BAT[j]);
-                if (checkBuck == null || checkBuck.isEmpty()) {
-                    if (prefix.equals(getPrefix(j, ld))) {
-                        secMem.deleteBucketAt(BAT[j]);
-                        BAT[j] = (int) secBAT.get(i);
-                        mainMemRepointed[j]=true;
-//                        System.out.println("Repointing: Main "+j+" ->"+" Sec "+(CommonUtils.dirSize+i));
-                    }
-                }
+        //Two Entries Pointing to the same Bucket
+        if(mainMem.getGlobalDepth()>11){
+            for(int i=secMem.getBuckAddressTable().size()-1;i>0;i--){
+                secMem.insertAddress(i+CommonUtils.dirSize,getMatchAddress(i+CommonUtils.dirSize));
+                System.out.println("Inserting "+getMatchAddress(i+CommonUtils.dirSize)
+                        +" from "+(i+CommonUtils.dirSize)/2+" to "+i+CommonUtils.dirSize);
             }
-
-            for (int j = 0; j < secBAT.size(); j++) {
-                if(secMemRepointed[j])
-                    continue;
-                Bucket checkBuck = secMem.getBucketAt((int) secBAT.get(j));
-                if (checkBuck == null || checkBuck.isEmpty()) {
-                    if (prefix.equals(getPrefix(j, ld))) {
-                        secMem.deleteBucketAt((int) secBAT.get(j));
-                        secBAT.set(j, (int) secBAT.get(i));
-                        secMemRepointed[j]=true;
-//                        System.out.println("Repointing: Sec "+(CommonUtils.dirSize+j)+" ->"+" Sec "+(CommonUtils.dirSize+i));
-                    }
-                }
-            }
+        }
+        for(int i=mainMemLength-1;i>0;i--){
+            mainMem.insertAddress(i,mainMem.getBucketAddressAt(i/2));
+            System.out.println("Inserting "+mainMem.getBucketAddressAt(i)
+                    +" from "+i/2+" to "+i);
         }
     }
 
     public static void collide(Bucket buck,int val){
+//        System.out.println("Collision at bucket with LD: "+buck.getLocalDepth()+" GD: "+mainMem.getGlobalDepth());
         if(buck.getLocalDepth()==mainMem.getGlobalDepth() && mainMem.getGlobalDepth()<20){ //Resizing and rehashing takes place
-//            System.out.println("Resizing");
-            buck.setLocalDepth(buck.getLocalDepth()+1);
-            redist(buck,val,true);
-            repoint();
+            System.out.println("Resizing");
+//            buck.setLocalDepth(buck.getLocalDepth()+1);
+//            redist(buck,val,true);
+//            repoint();
+            resize();
+            insertVal(val,false);
         }
         else //Only bucket is split
         {
@@ -299,7 +237,7 @@ public class ExtHash {
             newBuck.insertRecord(val);
             int address=secMem.putBucket(index,newBuck);
 //            System.out.println("Inserting Address: "+address+" in Sec Mem at: "+index);
-            secMem.insertAddress(address,index);
+            secMem.insertAddress(index,address);
         }
     }
 
@@ -327,7 +265,7 @@ public class ExtHash {
             Bucket newBuck=new Bucket(mainMem.getGlobalDepth());
             newBuck.insertRecord(val);
             int address=secMem.putBucket(index,newBuck);
-            mainMem.insertAddress(address,index);
+            mainMem.insertAddress(index,address);
         }
     }
 
