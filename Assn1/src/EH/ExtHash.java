@@ -137,11 +137,11 @@ public class ExtHash {
                 if(mainMem.getBucketAddressAt(i)==address)
                     mainMem.insertAddress(i,newAddress);
             }
-            X=midX;
+            X=0;
         }
         for(int i=mainMemLength+1;i<secMem.getBuckAddressTable().size();i++)
         {
-            if(secMem.getBucketAddressAt(i)==address)
+            if(secMem.getBucketAddressAt(i)==address && i>=X)
                 secMem.insertAddress(i,newAddress);
         }
 
@@ -178,7 +178,7 @@ public class ExtHash {
         }
 
         //Two Entries Pointing to the same Bucket
-        if(mainMem.getGlobalDepth()>11){
+        if(mainMem.getGlobalDepth()>10){
             for(int i=secMem.getBuckAddressTable().size()-1;i>0;i--){
                 secMem.insertAddress(i+CommonUtils.dirSize,getMatchAddress(i+CommonUtils.dirSize));
                 System.out.println("Inserting "+getMatchAddress(i+CommonUtils.dirSize)
