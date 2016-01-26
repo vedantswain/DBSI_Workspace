@@ -10,7 +10,7 @@ public class launcher {
 
     public static void main(String[] args){
 //        CommonUtils.setBuckLength(2);
-        CommonUtils.setBuckLength(40);
+        CommonUtils.setBuckLength(10);
 
 
 //        System.out.println(ExtHash.getMSB(2));
@@ -25,12 +25,13 @@ public class launcher {
 //        ExtHash.insert(5);
 //        ExtHash.insert(3);
 //        ExtHash.insert(1);
+//        ExtHash.insert(1);
 
         Random rand=new Random();
 
-        for(int i=0;i<1000;i++){
+        for(int i=0;i<100000;i++){
             int randint=rand.nextInt(800000);
-            System.out.println("Inserting: "+randint+" | Record No. "+i);
+//            System.out.println("Inserting: "+randint+" | Record No. "+i);
             try {
                 ExtHash.insert(randint);
             }

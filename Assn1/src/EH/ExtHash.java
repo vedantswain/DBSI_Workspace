@@ -6,9 +6,6 @@ import EH.objects.SecMem;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
  * Created by vedantdasswain on 22/01/16.
@@ -118,7 +115,7 @@ public class ExtHash {
         int countPtr=getManytoOneCount(address);
         int midX=getMidIndex(address,countPtr,val);
 
-        int newAddress=secMem.putBucket(midX,newBuck);
+        int newAddress=secMem.putBucket(newBuck);
 
 //        System.out.println("MidX: "+midX);
 
@@ -181,14 +178,14 @@ public class ExtHash {
         if(mainMem.getGlobalDepth()>10){
             for(int i=secMem.getBuckAddressTable().size()-1;i>0;i--){
                 secMem.insertAddress(i+CommonUtils.dirSize,getMatchAddress(i+CommonUtils.dirSize));
-                System.out.println("Inserting "+getMatchAddress(i+CommonUtils.dirSize)
-                        +" from "+(i+CommonUtils.dirSize)/2+" to "+i+CommonUtils.dirSize);
+//                System.out.println("Inserting "+getMatchAddress(i+CommonUtils.dirSize)
+//                        +" from "+(i+CommonUtils.dirSize)/2+" to "+i+CommonUtils.dirSize);
             }
         }
         for(int i=mainMemLength-1;i>0;i--){
             mainMem.insertAddress(i,mainMem.getBucketAddressAt(i/2));
-            System.out.println("Inserting "+mainMem.getBucketAddressAt(i)
-                    +" from "+i/2+" to "+i);
+//            System.out.println("Inserting "+mainMem.getBucketAddressAt(i)
+//                    +" from "+i/2+" to "+i);
         }
     }
 
@@ -235,7 +232,7 @@ public class ExtHash {
             //add new address here and add value to bucket
             Bucket newBuck=new Bucket(mainMem.getGlobalDepth());
             newBuck.insertRecord(val);
-            int address=secMem.putBucket(index,newBuck);
+            int address=secMem.putBucket(newBuck);
 //            System.out.println("Inserting Address: "+address+" in Sec Mem at: "+index);
             secMem.insertAddress(index,address);
         }
@@ -264,7 +261,7 @@ public class ExtHash {
 //            System.out.println("New address entry for Ind: "+index);
             Bucket newBuck=new Bucket(mainMem.getGlobalDepth());
             newBuck.insertRecord(val);
-            int address=secMem.putBucket(index,newBuck);
+            int address=secMem.putBucket(newBuck);
             mainMem.insertAddress(index,address);
         }
     }
@@ -316,17 +313,17 @@ public class ExtHash {
         return searchBuck.searchRecord(val);
     }
 
-    public static int getBucketCount(){
-        int N=0;
-        HashMap buckMap=secMem.getBucketMap();
-        Iterator it = buckMap.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry)it.next();
-            N+=((Bucket)pair.getValue()).getCount();
-//            it.remove(); // avoids a ConcurrentModificationException
-        }
-        return N;
-    }
+//    public static int getBucketCount(){
+//        int N=0;
+//        HashMap buckMap=secMem.getBucketMap();
+//        Iterator it = buckMap.entrySet().iterator();
+//        while (it.hasNext()) {
+//            Map.Entry pair = (Map.Entry)it.next();
+//            N+=((Bucket)pair.getValue()).getCount();
+////            it.remove(); // avoids a ConcurrentModificationException
+//        }
+//        return N;
+//    }
 
     public static void insert(int val){
         insertVal(val,false);
