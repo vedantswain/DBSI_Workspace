@@ -24,6 +24,10 @@ public class SecMem {
 //        return bucketMap;
 //    }
 
+    public ArrayList getBucketList(){
+        return bucketList;
+    }
+
     public int getIndex() {
         return index;
     }

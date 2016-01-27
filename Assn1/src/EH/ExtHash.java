@@ -21,8 +21,8 @@ public class ExtHash {
 
     public static int getMSB(int val){
         BigInteger v = BigInteger.valueOf(val);
-//        int padding=log2(8);
-        int padding=log2(800000);
+        int padding=log2(8);
+//        int padding=log2(800000);
         String byteString = String.format("%0"+padding+"d",new BigInteger(v.toString(2)));
         String prefix=byteString.substring(0,mainMem.getGlobalDepth());
 //        System.out.println("For Val: "+val+" Index: "+msbV.intValue());
@@ -96,7 +96,7 @@ public class ExtHash {
         return getMSB(value);
     }
 
-    public static void split(Bucket usedBuck, int val, boolean splitOnce){
+    public static int split(Bucket usedBuck, int val, boolean splitOnce){
         int index=getMSB(val);
 //        System.out.println("Index: "+index+" Val: "+val);
 
@@ -128,6 +128,7 @@ public class ExtHash {
         int mainMemLength= mainMem.getGlobalDepth()<=10? (int) Math.pow(2, mainMem.getGlobalDepth()) :CommonUtils.dirSize;
 
         //Second half of the directory addresses new bucket
+        int pCost=0;
         int X=midX;
         if(midX<CommonUtils.dirSize){
             for(int i=midX;i<mainMemLength;i++){
@@ -138,18 +139,21 @@ public class ExtHash {
         }
         for(int i=mainMemLength+1;i<secMem.getBuckAddressTable().size();i++)
         {
-            if(secMem.getBucketAddressAt(i)==address && i>=X)
-                secMem.insertAddress(i,newAddress);
+            if(secMem.getBucketAddressAt(i)==address && i>=X) {
+                secMem.insertAddress(i, newAddress);
+                pCost++;
+            }
         }
 
         //Reinserting values in old bucket across both buckets
         int[] oldRecords=usedBuck.popBuck();
+        int riCost=0;
 
         for(int i=0;i<oldRecords.length;i++){
 //            System.out.println("Inserting Old: "+oldRecords[i]);
-            insertVal(oldRecords[i],splitOnce);
+            riCost+=insertVal(oldRecords[i],splitOnce);
         }
-        insertVal(val,splitOnce);
+        return 2+riCost+pCost+insertVal(val,splitOnce);
     }
 
     public static int getMatchAddress(int index){
@@ -159,7 +163,7 @@ public class ExtHash {
             return secMem.getBucketAddressAt(index/2);
     }
 
-    public static void resize(){
+    public static int resize(){
         mainMem.setGlobalDepth(mainMem.getGlobalDepth()+1);
         int mainMemLength= mainMem.getGlobalDepth()<=10? (int) Math.pow(2, mainMem.getGlobalDepth()) :CommonUtils.dirSize;
         System.out.println("GD: "+mainMem.getGlobalDepth());
@@ -174,12 +178,14 @@ public class ExtHash {
             }
         }
 
+        int cost=0;
         //Two Entries Pointing to the same Bucket
         if(mainMem.getGlobalDepth()>10){
             for(int i=secMem.getBuckAddressTable().size()-1;i>0;i--){
                 secMem.insertAddress(i+CommonUtils.dirSize,getMatchAddress(i+CommonUtils.dirSize));
 //                System.out.println("Inserting "+getMatchAddress(i+CommonUtils.dirSize)
 //                        +" from "+(i+CommonUtils.dirSize)/2+" to "+i+CommonUtils.dirSize);
+                cost++;
             }
         }
         for(int i=mainMemLength-1;i>0;i--){
@@ -187,26 +193,28 @@ public class ExtHash {
 //            System.out.println("Inserting "+mainMem.getBucketAddressAt(i)
 //                    +" from "+i/2+" to "+i);
         }
+
+        return cost;
     }
 
-    public static void collide(Bucket buck,int val){
+    public static int collide(Bucket buck,int val){
 //        System.out.println("Collision at bucket with LD: "+buck.getLocalDepth()+" GD: "+mainMem.getGlobalDepth());
         if(buck.getLocalDepth()==mainMem.getGlobalDepth() && mainMem.getGlobalDepth()<20){ //Resizing and rehashing takes place
             System.out.println("Resizing");
 //            buck.setLocalDepth(buck.getLocalDepth()+1);
 //            redist(buck,val,true);
 //            repoint();
-            resize();
-            insertVal(val,false);
+            int rsCost=resize();
+            return rsCost+insertVal(val,false);
         }
         else //Only bucket is split
         {
 //            System.out.println("Splitting");
-            split(buck,val,true);
+            return split(buck,val,true);
         }
     }
 
-    public static void insertToSec(int val,int index,boolean splitOnce){
+    public static int insertToSec(int val,int index,boolean splitOnce){
 //        System.out.println("Inserting in Sec at Index: "+index);
         if(secMem.getBuckAddressTable()==null){
             secMem.initBAT(CommonUtils.dirSize);
@@ -218,10 +226,12 @@ public class ExtHash {
             if(usedBuck.getIndex()>=CommonUtils.buckLength){
                 //splitting
                 if(!splitOnce)
-                    collide(usedBuck,val);
+                    return collide(usedBuck,val);
                     //chain
-                else
+                else {
                     usedBuck.chainRecord(val);
+                    return 1;
+                }
             }
             else{
 //                System.out.println("Space in bucket");
@@ -236,9 +246,10 @@ public class ExtHash {
 //            System.out.println("Inserting Address: "+address+" in Sec Mem at: "+index);
             secMem.insertAddress(index,address);
         }
+        return 0;
     }
 
-    public static void insertToMain(int val,int index,boolean splitOnce){
+    public static int insertToMain(int val,int index,boolean splitOnce){
         if (mainMem.getBucketAddressAt(index)!=-1){
             //bucket address exists
 //            System.out.println("Address entry for Ind: "+index+" is Address: "+mainMem.getBucketAddressAt(index));
@@ -247,9 +258,12 @@ public class ExtHash {
             if(usedBuck.getIndex()>=CommonUtils.buckLength){
                 //splitting
                 if(!splitOnce)
-                    collide(usedBuck,val);
+                    return collide(usedBuck,val);
                 else    //chain
+                {
                     usedBuck.chainRecord(val);
+                    return 1;
+                }
             }
             else{
 //                System.out.println("Space in bucket");
@@ -264,18 +278,19 @@ public class ExtHash {
             int address=secMem.putBucket(newBuck);
             mainMem.insertAddress(index,address);
         }
+        return 0;
     }
 
-    public static void insertVal(int val,boolean splitOnce){
+    public static int insertVal(int val,boolean splitOnce){
         if(val<0)
-            return;
+            return 0;
         int index=getMSB(val);
 //        System.out.println("Inserting Val: "+val+" at Index: "+index);
         if(index<CommonUtils.dirSize) {
-            insertToMain(val, index,splitOnce);
+            return insertToMain(val, index,splitOnce);
         }
         else{
-            insertToSec(val,index,splitOnce);
+            return insertToSec(val,index,splitOnce);
         }
     }
 
@@ -288,12 +303,12 @@ public class ExtHash {
         for(int i=0;i<mainMemLength;i++){
             System.out.println("Ind: "+i+" Bucket: "+BAT[i]+" LD: "+secMem.getBucketAt(BAT[i]).getLocalDepth());
         }
-        for(int i=0;i<secBAT.size();i++){
-            int j=CommonUtils.dirSize+i;
-            if(secBAT.get(i)==-1)
-                continue;
-            System.out.println("Ind: "+j+" Bucket: "+secBAT.get(i)+" LD: "+secMem.getBucketAt(secBAT.get(i)).getLocalDepth());
-        }
+//        for(int i=0;i<secBAT.size();i++){
+//            int j=CommonUtils.dirSize+i;
+//            if(secBAT.get(i)==-1)
+//                continue;
+//            System.out.println("Ind: "+j+" Bucket: "+secBAT.get(i)+" LD: "+secMem.getBucketAt(secBAT.get(i)).getLocalDepth());
+//        }
     }
 
     public static int searchVal(int val){
@@ -313,19 +328,16 @@ public class ExtHash {
         return searchBuck.searchRecord(val);
     }
 
-//    public static int getBucketCount(){
-//        int N=0;
-//        HashMap buckMap=secMem.getBucketMap();
-//        Iterator it = buckMap.entrySet().iterator();
-//        while (it.hasNext()) {
-//            Map.Entry pair = (Map.Entry)it.next();
-//            N+=((Bucket)pair.getValue()).getCount();
-////            it.remove(); // avoids a ConcurrentModificationException
-//        }
-//        return N;
-//    }
+    public static int getBucketCount(){
+        int N=0;
+        ArrayList buckList=secMem.getBucketList();
+        for (int i=0;i<buckList.size();i++) {
+            N+=((Bucket)buckList.get(i)).getCount();
+        }
+        return N;
+    }
 
     public static void insert(int val){
-        insertVal(val,false);
+        System.out.println(insertVal(val,false));
     }
 }
