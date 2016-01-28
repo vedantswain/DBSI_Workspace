@@ -21,7 +21,7 @@ public class ExtHash {
 
     public static int getMSB(int val){
         BigInteger v = BigInteger.valueOf(val);
-        int padding=log2(8);
+        int padding=log2(800000);
 //        int padding=log2(800000);
         String byteString = String.format("%0"+padding+"d",new BigInteger(v.toString(2)));
         String prefix=byteString.substring(0,mainMem.getGlobalDepth());
@@ -337,7 +337,7 @@ public class ExtHash {
         return N;
     }
 
-    public static void insert(int val){
-        insertVal(val,false);
+    public static int insert(int val){
+        return insertVal(val,false);
     }
 }

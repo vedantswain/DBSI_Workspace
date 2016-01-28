@@ -1,7 +1,5 @@
 package LH.main;
 
-import java.util.Random;
-
 /**
  * Created by shubham on 1/25/16.
  */
@@ -9,7 +7,7 @@ public class LHLauncher {
 
     static LinearHash linearHash;
 
-    public static void main(String[] args) {
+   /* public static void main(String[] args) {
 //        for LH: Bucket Size = 10
         int bucketSize = 10;
         int bucketNum = 1;
@@ -47,5 +45,5 @@ public class LHLauncher {
         System.out.println("Storage Utilization:"+CostMetrics.getStorageUtil());
         System.out.println("Average Successful Search Cost:"+CostMetrics.getAvgSuccessCost());
         System.out.println("Splitting Cost:"+CostMetrics.getSplitingCost());
-    }
+    }*/
 }

@@ -1,6 +1,9 @@
 import EH.CommonUtils;
 import EH.ExtHash;
+import LH.main.LinearHash;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Random;
 
 /**
@@ -8,8 +11,10 @@ import java.util.Random;
  */
 public class launcher {
 
+    static int buckSize=40;
+
     public static void main(String[] args){
-        CommonUtils.setBuckLength(2);
+        CommonUtils.setBuckLength(buckSize);
 //        CommonUtils.setBuckLength(10);
 
 
@@ -18,12 +23,12 @@ public class launcher {
 //        System.out.println(ExtHash.getMSB(3));
 //        System.out.println(ExtHash.getMSB(5));
 
-        ExtHash.insert(7);
-        ExtHash.insert(0);
-        ExtHash.insert(4);
-        ExtHash.insert(5);
-        ExtHash.insert(5);
-        ExtHash.insert(3);
+//        ExtHash.insert(7);
+//        ExtHash.insert(0);
+//        ExtHash.insert(4);
+//        ExtHash.insert(5);
+//        ExtHash.insert(5);
+//        ExtHash.insert(3);
 //        ExtHash.insert(1);
 //        ExtHash.insert(1);
 
@@ -44,12 +49,12 @@ public class launcher {
 
 //        System.out.println(new BigInteger("10010011110000110111"));
 
-        ExtHash.printBAT();
+//        ExtHash.printBAT();
 //        secMem.printMap();
 //
 //        System.out.println("Total Buckets: "+getBucketCount());
 
-        System.out.println(ExtHash.searchVal(0));
+//        System.out.println(ExtHash.searchVal(0));
 
 //        secMem.printMap();
 
@@ -58,54 +63,103 @@ public class launcher {
 
         Random rand=new Random();
 
+        //Data Set 1
         for(int i=0;i<dataSet1.length;i++){
             int randint=rand.nextInt(800000);
             dataSet1[i] = randint;
         }
 
+        //Data Set 2
         for (int i = 0; i < 60000; i++) {
             int randint=rand.nextInt((800000 - 700000) + 1) + 700000;
             dataSet2[i] = randint;
         }
-
         for (int i = 0; i < 40000; i++) {
             int randint=rand.nextInt(700000);
             dataSet2[i+60000] = randint;
         }
 
-        System.out.println("DataSet 1:");
-        for (int ele: dataSet1) {
-            System.out.println(ele);
-        }
+//        System.out.println("DataSet 1:");
+//        for (int ele: dataSet1) {
+//            System.out.println(ele);
+//        }
 //        System.out.println();
 //        System.out.println("DataSet 2:");
 //        for (int ele: dataSet2) {
 //            System.out.println(ele);
 //        }
-        execute(dataSet1);
+        execute(dataSet1,1);
     }
 
-    public static void execute(int[] dataSet){
+
+    public static void search(int[] dataSet, int multiplier,FileWriter ehSearchFW){
         Random rand=new Random();
-        int multiplier = 0;
-        int[] searchElements;
-        int[] searchElementIndices;
-        for (int i = 0; i < dataSet.length; i++) {
-            if (i % 5000 == 0){
-                searchElements = new int[50];
-                searchElementIndices = new int[50];
-                for (int j = 0; j < 50; j++) {
-                    int randIndex = rand.nextInt((5000*(multiplier+1)) - (5000*(multiplier))) + (5000*(multiplier));
-                    searchElements[j] = dataSet[randIndex];
-                    searchElementIndices[j] = randIndex;
-                }
-                ++multiplier;
-                System.out.println("Elements of searchElements: ");
-                for (int j = 0; j < searchElements.length; j++) {
-                    System.out.println("element: "+searchElements[j]+", index: "+searchElementIndices[j]+
-                            ", multiplier: "+multiplier);
+        int[] searchElements = new int[50];
+        int[] searchElementIndices = new int[50];
+
+        try {
+            for (int j = 0; j < 50; j++) {
+                int randIndex = rand.nextInt((5000 * (multiplier + 1)) - (5000 * (multiplier))) + (5000 * (multiplier));
+                searchElements[j] = dataSet[randIndex];
+                searchElementIndices[j] = randIndex;
+            }
+            ++multiplier;
+
+            int ehHits = 0;
+            int ehSearchCost = 0;
+
+//        System.out.println("Elements of searchElements: ");
+            for (int j = 0; j < searchElements.length; j++) {
+//            System.out.println("element: "+searchElements[j]+", index: "+searchElementIndices[j]+
+//                    ", multiplier: "+multiplier);
+                int ehSearchVal = ExtHash.searchVal(searchElements[j]);
+                ehSearchCost += ehSearchVal;
+                if (ehSearchVal > 0) {
+                    ehHits++;
                 }
             }
+
+            int ehAveSearch=ehSearchCost/ehHits;
+            ehSearchFW.append(ehAveSearch+"\n");
+//        System.out.println("EH Average Search Cost: "+(ehSearchCost/ehHits));
         }
+        catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    public static void execute(int[] dataSet, int setNo){
+        int multiplier = 0;
+        LinearHash linHash=new LinearHash(buckSize,1);
+
+        String ehFileName="EH_Set"+setNo+"_Buck"+buckSize+".csv";
+        String HEADER="Split Cost"+","+"Storage Use"+"\n";
+        String ehSearchFileName="EH_Set"+setNo+"_Buck"+buckSize+"_search"+".csv";
+        String SEARCH_HEADER="Search Cost"+"\n";
+
+        try {
+            FileWriter ehFW=new FileWriter(ehFileName);
+            ehFW.append(HEADER);
+            FileWriter ehSearchFW = new FileWriter(ehSearchFileName);
+            ehSearchFW.append(SEARCH_HEADER);
+
+            for (int i = 0; i < dataSet.length; i++) {
+                int ehSplitCost=ExtHash.insert(dataSet[i]);
+                int ehNumBucks=ExtHash.getBucketCount();
+                double ehStoreUse=(i+1)/(ehNumBucks*buckSize*1.0);
+    //            System.out.println("EH Splitting cost: "+ehSplitCost);
+                if (i>0 && i % 5000 == 0){
+    //                System.out.println("EH Storage Utilisation: "+ehStoreUse);
+                    search(dataSet,multiplier,ehSearchFW);
+                }
+                ehFW.append(ehSplitCost+","+ehStoreUse+"\n");
+            }
+
+            ehFW.close();
+            ehSearchFW.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("LH SplitCost: "+ LH.main.CommonUtils.getSplitCost());
     }
 }
