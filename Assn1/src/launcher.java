@@ -1,5 +1,6 @@
 import EH.CommonUtils;
 import EH.ExtHash;
+import LH.main.CostMetrics;
 import LH.main.LinearHash;
 
 import java.io.FileWriter;
@@ -92,7 +93,7 @@ public class launcher {
     }
 
 
-    public static void search(int[] dataSet, int multiplier,FileWriter ehSearchFW){
+    public static void search(int[] dataSet, int multiplier,FileWriter ehSearchFW, FileWriter lhSearchFW){
         Random rand=new Random();
         int[] searchElements = new int[50];
         int[] searchElementIndices = new int[50];
@@ -107,6 +108,9 @@ public class launcher {
 
             int ehHits = 0;
             int ehSearchCost = 0;
+            int lhHits = 0;
+            int lhSearchCost = 0;
+
 
 //        System.out.println("Elements of searchElements: ");
             for (int j = 0; j < searchElements.length; j++) {
@@ -137,26 +141,42 @@ public class launcher {
         String ehSearchFileName="EH_Set"+setNo+"_Buck"+buckSize+"_search"+".csv";
         String SEARCH_HEADER="Search Cost"+"\n";
 
+        String lhFileName="LH_Set"+setNo+"_Buck"+buckSize+".csv";
+        String lhSearchFileName="LH_Set"+setNo+"_Buck"+buckSize+"_search"+".csv";
+
         try {
             FileWriter ehFW=new FileWriter(ehFileName);
             ehFW.append(HEADER);
             FileWriter ehSearchFW = new FileWriter(ehSearchFileName);
             ehSearchFW.append(SEARCH_HEADER);
 
+            FileWriter lhFW=new FileWriter(lhFileName);
+            ehFW.append(HEADER);
+            FileWriter lhSearchFW = new FileWriter(lhSearchFileName);
+            ehSearchFW.append(SEARCH_HEADER);
+
             for (int i = 0; i < dataSet.length; i++) {
                 int ehSplitCost=ExtHash.insert(dataSet[i]);
                 int ehNumBucks=ExtHash.getBucketCount();
                 double ehStoreUse=(i+1)/(ehNumBucks*buckSize*1.0);
+
+                int lhSplitCost=linHash.insert(dataSet[i]);
+                double lhStoreUse= (double) CostMetrics.getStorageUtil();
+
     //            System.out.println("EH Splitting cost: "+ehSplitCost);
                 if (i>0 && i % 5000 == 0){
     //                System.out.println("EH Storage Utilisation: "+ehStoreUse);
-                    search(dataSet,multiplier,ehSearchFW);
+                    search(dataSet,multiplier,ehSearchFW,lhSearchFW);
                 }
+
                 ehFW.append(ehSplitCost+","+ehStoreUse+"\n");
+                lhFW.append(lhSplitCost+","+lhStoreUse+"\n");
             }
 
             ehFW.close();
             ehSearchFW.close();
+            lhFW.close();
+            lhSearchFW.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
