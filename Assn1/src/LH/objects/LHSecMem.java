@@ -36,10 +36,11 @@ public class LHSecMem {
         int[] poppedRecords = bucketMap.get(nextToSplit).popAllBucks();
 //        System.out.println("Split Cost to be added: "+(int) (Math.ceil((float)poppedRecords.length / (float)CommonUtils.getBucketSize())));
 //        CommonUtils.addSplitCost((int) (Math.ceil((float)poppedRecords.length / (float)CommonUtils.getBucketSize())));
-        CommonUtils.setSplitCost(CommonUtils.getSplitCost()+(int)
-                (Math.ceil((float)poppedRecords.length / (float)CommonUtils.getBucketSize())));
+        int poppedBucketNum = (int) (Math.ceil((float)poppedRecords.length / (float)CommonUtils.getBucketSize()));
+        CommonUtils.setSplitCost(CommonUtils.getSplitCost()+poppedBucketNum);
         bucketMap.remove(nextToSplit);
         ++nextToSplit;
+        CommonUtils.setBucketNum(CommonUtils.getBucketNum()-poppedBucketNum);
 
         if (nextToSplit>=getRoundNum()){
             ++hashExp;
@@ -77,6 +78,7 @@ public class LHSecMem {
         if (bucketMap.get(bucketAddr) == null) {
             //if there is no bucket
             bucketMap.put(bucketAddr,new LHBucket());
+            CommonUtils.setBucketNum(CommonUtils.getBucketNum()+1);
             bucketMap.get(bucketAddr).insertRecordInBucket(record);
         }
         else if (bucketMap.get(bucketAddr).isFull()){
@@ -91,7 +93,6 @@ public class LHSecMem {
             //Bucket exists and is not full
             bucketMap.get(bucketAddr).insertRecordInBucket(record);
         }
-
         if (flag){
             int returnVal = 0;
             CommonUtils.setRecordNum(CommonUtils.getRecordNum()+1);
@@ -150,12 +151,12 @@ public class LHSecMem {
         System.out.println("Number of total records inserted: " + CommonUtils.getRecordNum());
     }
 
-    public void countBuckets(){
-        Set<Integer> keySet = bucketMap.keySet();
-        for (int key: keySet) {
-            bucketMap.get(key).count();
-        }
-    }
+//    public void countBuckets(){
+//        Set<Integer> keySet = bucketMap.keySet();
+//        for (int key: keySet) {
+//            bucketMap.get(key).count();
+//        }
+//    }
 
     public int getRoundNum(){
         return (int)(Math.pow(2,hashExp)* CommonUtils.getInitNumBuckets());

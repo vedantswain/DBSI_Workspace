@@ -25,6 +25,7 @@ public class LHLauncher {
             System.out.println("Inserting: " + randInt + " | Record No. " + i);
             try {
                 linearHash.insert(randInt);
+                System.out.println("Util: "+CostMetrics.getStorageUtil());
 //                System.out.println("Split Cost: "+linearHash.insert(randInt));
             } catch (Exception e) {
                 e.printStackTrace();
@@ -33,7 +34,7 @@ public class LHLauncher {
         }
 
 //        linearHash.lhSecMem.printAllRecords();
-        linearHash.lhSecMem.countBuckets();
+//        linearHash.lhSecMem.countBuckets();
 
         System.out.println();
         System.out.println("Record to be searched:" + searchRecord);
