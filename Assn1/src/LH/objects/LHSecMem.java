@@ -40,7 +40,7 @@ public class LHSecMem {
         CommonUtils.setSplitCost(CommonUtils.getSplitCost()+poppedBucketNum);
         bucketMap.remove(nextToSplit);
         ++nextToSplit;
-        CommonUtils.setBucketNum(CommonUtils.getBucketNum()-poppedBucketNum);
+        CommonUtils.setBucketNum(CommonUtils.getBucketNum()-poppedBucketNum+1);
 
         if (nextToSplit>=getRoundNum()){
             ++hashExp;
@@ -117,7 +117,7 @@ public class LHSecMem {
     }
 
     public int searchRecordInMem(int record){
-        int successSearchBucketNum;
+        int successSearchBucketNum=0;
         int bucketAddr = primaryHash(record);
         if (bucketAddr < nextToSplit){
             bucketAddr = secondaryHash(record);
@@ -127,11 +127,12 @@ public class LHSecMem {
             return -1;
 
         int[] poppedRecords = bucketMap.get(bucketAddr).popAllBucks();
-        successSearchBucketNum = (int) (Math.ceil((float)poppedRecords.length / (float)CommonUtils.getBucketSize()));
+//        successSearchBucketNum = (int) (Math.ceil((float)poppedRecords.length / (float)CommonUtils.getBucketSize()));
 //        System.out.println("successSearchBucketNum: "+successSearchBucketNum);
         boolean flag = false;
-        for (int rec: poppedRecords) {
-            if (rec == record){
+        for (int i=0;i<poppedRecords.length;i++) {
+            if (poppedRecords[i] == record){
+                successSearchBucketNum = (int) (Math.ceil((float)i / (float)CommonUtils.getBucketSize()));
                 flag = true;
                 break;
             }
