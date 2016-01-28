@@ -12,7 +12,8 @@ import java.util.Random;
  */
 public class launcher {
 
-    static int buckSize=10;
+    static int buckSize=40;
+    static LinearHash linHash;
 
     public static void main(String[] args){
         CommonUtils.setBuckLength(buckSize);
@@ -89,7 +90,7 @@ public class launcher {
 //        for (int ele: dataSet2) {
 //            System.out.println(ele);
 //        }
-        execute(dataSet1,1);
+        execute(dataSet2,2);
     }
 
 
@@ -97,6 +98,9 @@ public class launcher {
         Random rand=new Random();
         int[] searchElements = new int[50];
         int[] searchElementIndices = new int[50];
+
+        LH.main.CommonUtils.setSuccessSearchNum(0);
+        LH.main.CommonUtils.setSuccessSearchBucketNum(0);
 
         try {
             for (int j = 0; j < 50; j++) {
@@ -108,14 +112,13 @@ public class launcher {
 
             int ehHits = 0;
             int ehSearchCost = 0;
-            int lhHits = 0;
-            int lhSearchCost = 0;
-
 
 //        System.out.println("Elements of searchElements: ");
             for (int j = 0; j < searchElements.length; j++) {
 //            System.out.println("element: "+searchElements[j]+", index: "+searchElementIndices[j]+
 //                    ", multiplier: "+multiplier);
+                linHash.search(searchElements[j]);
+
                 int ehSearchVal = ExtHash.searchVal(searchElements[j]);
                 ehSearchCost += ehSearchVal;
                 if (ehSearchVal > 0) {
@@ -125,6 +128,7 @@ public class launcher {
 
             int ehAveSearch=ehSearchCost/ehHits;
             ehSearchFW.append(ehAveSearch+"\n");
+            lhSearchFW.append(CostMetrics.getAvgSuccessCost()+"\n");
 //        System.out.println("EH Average Search Cost: "+(ehSearchCost/ehHits));
         }
         catch (IOException e){
@@ -134,7 +138,7 @@ public class launcher {
 
     public static void execute(int[] dataSet, int setNo){
         int multiplier = 0;
-        LinearHash linHash=new LinearHash(buckSize,1);
+        linHash=new LinearHash(buckSize,1);
 
         String ehFileName="EH_Set"+setNo+"_Buck"+buckSize+".csv";
         String HEADER="Split Cost"+","+"Storage Use"+"\n";
@@ -151,9 +155,9 @@ public class launcher {
             ehSearchFW.append(SEARCH_HEADER);
 
             FileWriter lhFW=new FileWriter(lhFileName);
-            ehFW.append(HEADER);
+            lhFW.append(HEADER);
             FileWriter lhSearchFW = new FileWriter(lhSearchFileName);
-            ehSearchFW.append(SEARCH_HEADER);
+            lhSearchFW.append(SEARCH_HEADER);
 
             for (int i = 0; i < dataSet.length; i++) {
                 int ehSplitCost=ExtHash.insert(dataSet[i]);
@@ -180,6 +184,6 @@ public class launcher {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("LH SplitCost: "+ LH.main.CommonUtils.getSplitCost());
+        System.out.println("Fin");
     }
 }
