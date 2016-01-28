@@ -314,18 +314,20 @@ public class ExtHash {
     public static int searchVal(int val){
         int index=getMSB(val);
         int buckAddress;
+        int dirCost=0;
         if(index<CommonUtils.dirSize) {
             buckAddress=mainMem.getBucketAddressAt(index);
         }
         else{
             buckAddress=secMem.getBucketAddressAt(index);
+            dirCost++;
         }
 //        System.out.println("Searching in Bucket: "+buckAddress);
         Bucket searchBuck=secMem.getBucketAt(buckAddress);
         if(searchBuck==null) {
             return 0;
         }
-        return searchBuck.searchRecord(val);
+        return dirCost+searchBuck.searchRecord(val);
     }
 
     public static int getBucketCount(){

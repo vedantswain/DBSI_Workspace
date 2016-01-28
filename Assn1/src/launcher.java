@@ -126,7 +126,7 @@ public class launcher {
                 }
             }
 
-            int ehAveSearch=ehSearchCost/ehHits;
+            double ehAveSearch=ehSearchCost/(ehHits*1.0);
             ehSearchFW.append(ehAveSearch+"\n");
             lhSearchFW.append(CostMetrics.getAvgSuccessCost()+"\n");
 //        System.out.println("EH Average Search Cost: "+(ehSearchCost/ehHits));
