@@ -338,6 +338,6 @@ public class ExtHash {
     }
 
     public static void insert(int val){
-        System.out.println(insertVal(val,false));
+        insertVal(val,false);
     }
 }

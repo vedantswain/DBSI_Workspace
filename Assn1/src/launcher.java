@@ -22,8 +22,8 @@ public class launcher {
         ExtHash.insert(5);
         ExtHash.insert(5);
         ExtHash.insert(3);
-        ExtHash.insert(1);
-        ExtHash.insert(1);
+//        ExtHash.insert(1);
+//        ExtHash.insert(1);
 
 //        Random rand=new Random();
 //
@@ -47,7 +47,7 @@ public class launcher {
 //
 //        System.out.println("Total Buckets: "+getBucketCount());
 
-//        System.out.println(ExtHash.searchVal(0));
+        System.out.println(ExtHash.searchVal(0));
 
 //        secMem.printMap();
 
