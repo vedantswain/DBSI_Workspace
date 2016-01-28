@@ -83,7 +83,7 @@ public class launcher {
     }
 
     public static void main(String[] args){
-          generateData();
+//          generateData();
 
           int[] dataSet1=readData(1);
           int[] dataSet2=readData(2);
