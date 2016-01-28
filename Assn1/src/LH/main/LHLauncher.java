@@ -32,7 +32,7 @@ public class LHLauncher {
             }
         }
 
-        linearHash.lhSecMem.printAllRecords();
+//        linearHash.lhSecMem.printAllRecords();
         linearHash.lhSecMem.countBuckets();
 
         System.out.println();

@@ -98,6 +98,7 @@ public class LHSecMem {
             splitAccessNumSet = new HashSet<>();
         }
         else {
+//            System.out.println("nextToSplit: "+nextToSplit+", bucketAddr: "+bucketAddr+", val: "+record);
             if (bucketAddr!=nextToSplit)
                 splitAccessNumSet.add(bucketAddr);
         }
