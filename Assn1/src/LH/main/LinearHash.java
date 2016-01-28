@@ -18,8 +18,13 @@ public class LinearHash {
         CommonUtils.setSplitCost(0);
     }
 
-    public void insert(int val) {
-        lhSecMem.insertRecordInMem(val, true);
+    /**
+     *
+     * @param val: value to be inserted
+     * @return 0, if no splitting done; splitting cose otherwise
+     */
+    public int insert(int val) {
+        return lhSecMem.insertRecordInMem(val, true);
     }
 
     public void search(int val) {

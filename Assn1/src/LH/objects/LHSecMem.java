@@ -32,10 +32,12 @@ public class LHSecMem {
             return;
         }
 
-        CommonUtils.addSplitCost(1);
+//        CommonUtils.addSplitCost(1);
         int[] poppedRecords = bucketMap.get(nextToSplit).popAllBucks();
 //        System.out.println("Split Cost to be added: "+(int) (Math.ceil((float)poppedRecords.length / (float)CommonUtils.getBucketSize())));
-        CommonUtils.addSplitCost((int) (Math.ceil((float)poppedRecords.length / (float)CommonUtils.getBucketSize())));
+//        CommonUtils.addSplitCost((int) (Math.ceil((float)poppedRecords.length / (float)CommonUtils.getBucketSize())));
+        CommonUtils.setSplitCost(CommonUtils.getSplitCost()+(int)
+                (Math.ceil((float)poppedRecords.length / (float)CommonUtils.getBucketSize())));
         bucketMap.remove(nextToSplit);
         ++nextToSplit;
 
@@ -62,7 +64,7 @@ public class LHSecMem {
      * @param record: record to be inserted
      * @param flag: true for new record; to call split on the current method call or not
      */
-    public void insertRecordInMem(int record, boolean flag){
+    public int insertRecordInMem(int record, boolean flag){
 
         int bucketAddr = primaryHash(record);
         if (bucketAddr < nextToSplit){
@@ -81,6 +83,7 @@ public class LHSecMem {
 //            System.out.println("Add to overflow");
             bucketMap.get(bucketAddr).addOverFlow(record);
             if (flag) {
+                CommonUtils.setSplitCost(1);
                 split();
             }
         }
@@ -90,17 +93,23 @@ public class LHSecMem {
         }
 
         if (flag){
+            int returnVal = 0;
             CommonUtils.setRecordNum(CommonUtils.getRecordNum()+1);
             if (!splitAccessNumSet.isEmpty()){
 //                System.out.println("Size of splitAccessSet: "+splitAccessNumSet.size());
-                CommonUtils.addSplitCost(splitAccessNumSet.size());
+//                CommonUtils.addSplitCost(splitAccessNumSet.size());
+                CommonUtils.setSplitCost(CommonUtils.getSplitCost()+splitAccessNumSet.size());
+                returnVal = CommonUtils.getSplitCost();
             }
             splitAccessNumSet = new HashSet<>();
+            CommonUtils.setSplitCost(0);
+            return returnVal;
         }
         else {
 //            System.out.println("nextToSplit: "+nextToSplit+", bucketAddr: "+bucketAddr+", val: "+record);
             if (bucketAddr!=nextToSplit)
                 splitAccessNumSet.add(bucketAddr);
+            return -1;
         }
 
 //        printAllRecords();

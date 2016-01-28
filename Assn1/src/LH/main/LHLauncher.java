@@ -25,8 +25,8 @@ public class LHLauncher {
             System.out.println("Inserting: " + randInt + " | Record No. " + i);
             try {
                 linearHash.insert(randInt);
+//                System.out.println("Split Cost: "+linearHash.insert(randInt));
             } catch (Exception e) {
-                System.out.println("Inserting: " + randInt + " | Record No. " + i);
                 e.printStackTrace();
                 break;
             }
@@ -46,6 +46,5 @@ public class LHLauncher {
 //                ", Number of successful searches: "+CommonUtils.getSuccessSearchNum());
         System.out.println("Storage Utilization:"+CostMetrics.getStorageUtil());
         System.out.println("Average Successful Search Cost:"+CostMetrics.getAvgSuccessCost());
-        System.out.println("Splitting Cost:"+CostMetrics.getSplitingCost());
     }
 }
