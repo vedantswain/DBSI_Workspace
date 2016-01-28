@@ -123,6 +123,9 @@ public class LHSecMem {
             bucketAddr = secondaryHash(record);
         }
 
+        if(bucketMap.get(bucketAddr)==null)
+            return -1;
+
         int[] poppedRecords = bucketMap.get(bucketAddr).popAllBucks();
         successSearchBucketNum = (int) (Math.ceil((float)poppedRecords.length / (float)CommonUtils.getBucketSize()));
 //        System.out.println("successSearchBucketNum: "+successSearchBucketNum);

@@ -12,11 +12,10 @@ import java.util.Random;
  */
 public class launcher {
 
-    static int buckSize=40;
+    static int buckSize=10;
     static LinearHash linHash;
 
     public static void main(String[] args){
-        CommonUtils.setBuckLength(buckSize);
 //        CommonUtils.setBuckLength(10);
 
 
@@ -71,6 +70,8 @@ public class launcher {
             dataSet1[i] = randint;
         }
 
+        writeDataSet(dataSet1,1);
+
         //Data Set 2
         for (int i = 0; i < 60000; i++) {
             int randint=rand.nextInt((800000 - 700000) + 1) + 700000;
@@ -81,6 +82,9 @@ public class launcher {
             dataSet2[i+60000] = randint;
         }
 
+        writeDataSet(dataSet2,2);
+
+
 //        System.out.println("DataSet 1:");
 //        for (int ele: dataSet1) {
 //            System.out.println(ele);
@@ -90,9 +94,24 @@ public class launcher {
 //        for (int ele: dataSet2) {
 //            System.out.println(ele);
 //        }
-        execute(dataSet2,2);
+        execute(dataSet1,1,10);
+        execute(dataSet1,1,40);
+        execute(dataSet2,2,10);
+        execute(dataSet2,2,40);
     }
 
+    public static void writeDataSet(int[] dataSet,int setNo){
+        String filename="dataSet"+setNo+".txt";
+        try {
+            FileWriter fw=new FileWriter(filename);
+            for(int i:dataSet){
+                fw.append(i+"\n");
+            }
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static void search(int[] dataSet, int multiplier,FileWriter ehSearchFW, FileWriter lhSearchFW){
         Random rand=new Random();
@@ -136,8 +155,9 @@ public class launcher {
         }
     }
 
-    public static void execute(int[] dataSet, int setNo){
+    public static void execute(int[] dataSet, int setNo,int buckSize){
         int multiplier = 0;
+        CommonUtils.setBuckLength(buckSize);
         linHash=new LinearHash(buckSize,1);
 
         String ehFileName="EH_Set"+setNo+"_Buck"+buckSize+".csv";
@@ -184,6 +204,6 @@ public class launcher {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("Fin");
+        System.out.println("DataSet: "+setNo+", BuckSize: "+buckSize+", Fin");
     }
 }
