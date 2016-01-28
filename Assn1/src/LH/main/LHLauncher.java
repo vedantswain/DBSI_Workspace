@@ -23,15 +23,16 @@ public class LHLauncher {
             System.out.println("Inserting: " + randInt + " | Record No. " + i);
             try {
                 linearHash.insert(randInt);
+                System.out.println("Util: "+CostMetrics.getStorageUtil());
+//                System.out.println("Split Cost: "+linearHash.insert(randInt));
             } catch (Exception e) {
-                System.out.println("Inserting: " + randInt + " | Record No. " + i);
                 e.printStackTrace();
                 break;
             }
         }
 
 //        linearHash.lhSecMem.printAllRecords();
-        linearHash.lhSecMem.countBuckets();
+//        linearHash.lhSecMem.countBuckets();
 
         System.out.println();
         System.out.println("Record to be searched:" + searchRecord);
@@ -46,4 +47,5 @@ public class LHLauncher {
         System.out.println("Average Successful Search Cost:"+CostMetrics.getAvgSuccessCost());
         System.out.println("Splitting Cost:"+CostMetrics.getSplitingCost());
     }*/
+
 }

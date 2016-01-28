@@ -13,8 +13,8 @@ public class CostMetrics {
         return ((float)CommonUtils.getRecordNum()/(float)(CommonUtils.getBucketNum()*CommonUtils.getBucketSize()));
     }
 
-    public static float getSplitingCost(){
-        return ((float)CommonUtils.getSplitCost());
-    }
+//    public static float getSplitingCost(){
+//        return ((float)CommonUtils.getSplitCost());
+//    }
 
 }

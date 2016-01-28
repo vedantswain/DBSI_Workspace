@@ -32,12 +32,15 @@ public class LHSecMem {
             return;
         }
 
-        CommonUtils.addSplitCost(1);
+//        CommonUtils.addSplitCost(1);
         int[] poppedRecords = bucketMap.get(nextToSplit).popAllBucks();
 //        System.out.println("Split Cost to be added: "+(int) (Math.ceil((float)poppedRecords.length / (float)CommonUtils.getBucketSize())));
-        CommonUtils.addSplitCost((int) (Math.ceil((float)poppedRecords.length / (float)CommonUtils.getBucketSize())));
+//        CommonUtils.addSplitCost((int) (Math.ceil((float)poppedRecords.length / (float)CommonUtils.getBucketSize())));
+        int poppedBucketNum = (int) (Math.ceil((float)poppedRecords.length / (float)CommonUtils.getBucketSize()));
+        CommonUtils.setSplitCost(CommonUtils.getSplitCost()+poppedBucketNum);
         bucketMap.remove(nextToSplit);
         ++nextToSplit;
+        CommonUtils.setBucketNum(CommonUtils.getBucketNum()-poppedBucketNum);
 
         if (nextToSplit>=getRoundNum()){
             ++hashExp;
@@ -62,7 +65,7 @@ public class LHSecMem {
      * @param record: record to be inserted
      * @param flag: true for new record; to call split on the current method call or not
      */
-    public void insertRecordInMem(int record, boolean flag){
+    public int insertRecordInMem(int record, boolean flag){
 
         int bucketAddr = primaryHash(record);
         if (bucketAddr < nextToSplit){
@@ -75,12 +78,14 @@ public class LHSecMem {
         if (bucketMap.get(bucketAddr) == null) {
             //if there is no bucket
             bucketMap.put(bucketAddr,new LHBucket());
+            CommonUtils.setBucketNum(CommonUtils.getBucketNum()+1);
             bucketMap.get(bucketAddr).insertRecordInBucket(record);
         }
         else if (bucketMap.get(bucketAddr).isFull()){
 //            System.out.println("Add to overflow");
             bucketMap.get(bucketAddr).addOverFlow(record);
             if (flag) {
+                CommonUtils.setSplitCost(1);
                 split();
             }
         }
@@ -88,19 +93,24 @@ public class LHSecMem {
             //Bucket exists and is not full
             bucketMap.get(bucketAddr).insertRecordInBucket(record);
         }
-
         if (flag){
+            int returnVal = 0;
             CommonUtils.setRecordNum(CommonUtils.getRecordNum()+1);
             if (!splitAccessNumSet.isEmpty()){
 //                System.out.println("Size of splitAccessSet: "+splitAccessNumSet.size());
-                CommonUtils.addSplitCost(splitAccessNumSet.size());
+//                CommonUtils.addSplitCost(splitAccessNumSet.size());
+                CommonUtils.setSplitCost(CommonUtils.getSplitCost()+splitAccessNumSet.size());
+                returnVal = CommonUtils.getSplitCost();
             }
             splitAccessNumSet = new HashSet<>();
+            CommonUtils.setSplitCost(0);
+            return returnVal;
         }
         else {
 //            System.out.println("nextToSplit: "+nextToSplit+", bucketAddr: "+bucketAddr+", val: "+record);
             if (bucketAddr!=nextToSplit)
                 splitAccessNumSet.add(bucketAddr);
+            return -1;
         }
 
 //        printAllRecords();
@@ -141,12 +151,12 @@ public class LHSecMem {
         System.out.println("Number of total records inserted: " + CommonUtils.getRecordNum());
     }
 
-    public void countBuckets(){
-        Set<Integer> keySet = bucketMap.keySet();
-        for (int key: keySet) {
-            bucketMap.get(key).count();
-        }
-    }
+//    public void countBuckets(){
+//        Set<Integer> keySet = bucketMap.keySet();
+//        for (int key: keySet) {
+//            bucketMap.get(key).count();
+//        }
+//    }
 
     public int getRoundNum(){
         return (int)(Math.pow(2,hashExp)* CommonUtils.getInitNumBuckets());

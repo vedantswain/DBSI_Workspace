@@ -53,16 +53,17 @@ public class LHBucket {
         }
     }
 
-    public void count(){
-        CommonUtils.setBucketNum(CommonUtils.getBucketNum()+1);
-        if (!this.overflowList.isEmpty()){
-            CommonUtils.setBucketNum(CommonUtils.getBucketNum()+overflowList.size());
-        }
-    }
+//    public void count(){
+//        CommonUtils.setBucketNum(CommonUtils.getBucketNum()+1);
+//        if (!this.overflowList.isEmpty()){
+//            CommonUtils.setBucketNum(CommonUtils.getBucketNum()+overflowList.size());
+//        }
+//    }
 
     public void addOverFlow(int record){
         if (overflowList.isEmpty() || overflowList.get(overflowList.size()-1).isFull()){
             overflowList.add(new LHBucket());
+            CommonUtils.setBucketNum(CommonUtils.getBucketNum()+1);
         }
         overflowList.get(overflowList.size()-1).insertRecordInBucket(record);
     }

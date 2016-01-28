@@ -11,7 +11,7 @@ import java.util.Random;
  */
 public class launcher {
 
-    static int buckSize=40;
+    static int buckSize=10;
 
     public static void main(String[] args){
         CommonUtils.setBuckLength(buckSize);
