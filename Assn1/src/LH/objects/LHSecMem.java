@@ -117,18 +117,21 @@ public class LHSecMem {
     }
 
     public int searchRecordInMem(int record){
-        int successSearchBucketNum;
+        int successSearchBucketNum=0;
         int bucketAddr = primaryHash(record);
         if (bucketAddr < nextToSplit){
             bucketAddr = secondaryHash(record);
         }
 
+        if(bucketMap.get(bucketAddr)==null)
+            return -1;
+
         int[] poppedRecords = bucketMap.get(bucketAddr).popAllBucks();
         successSearchBucketNum = (int) (Math.ceil((float)poppedRecords.length / (float)CommonUtils.getBucketSize()));
 //        System.out.println("successSearchBucketNum: "+successSearchBucketNum);
         boolean flag = false;
-        for (int rec: poppedRecords) {
-            if (rec == record){
+        for (int i=0;i<poppedRecords.length;i++) {
+            if (poppedRecords[i] == record){
                 flag = true;
                 break;
             }

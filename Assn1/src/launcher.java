@@ -3,8 +3,8 @@ import EH.ExtHash;
 import LH.main.CostMetrics;
 import LH.main.LinearHash;
 
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.util.ArrayList;
 import java.util.Random;
 
 /**
@@ -12,54 +12,10 @@ import java.util.Random;
  */
 public class launcher {
 
-    static int buckSize=40;
+    static int buckSize=10;
     static LinearHash linHash;
 
-    public static void main(String[] args){
-        CommonUtils.setBuckLength(buckSize);
-//        CommonUtils.setBuckLength(10);
-
-
-//        System.out.println(ExtHash.getMSB(2));
-//        System.out.println(ExtHash.getMSB(1));
-//        System.out.println(ExtHash.getMSB(3));
-//        System.out.println(ExtHash.getMSB(5));
-
-//        ExtHash.insert(7);
-//        ExtHash.insert(0);
-//        ExtHash.insert(4);
-//        ExtHash.insert(5);
-//        ExtHash.insert(5);
-//        ExtHash.insert(3);
-//        ExtHash.insert(1);
-//        ExtHash.insert(1);
-
-//        Random rand=new Random();
-//
-//        for(int i=0;i<100000;i++){
-//            int randint=rand.nextInt(800000);
-////            System.out.println("Inserting: "+randint+" | Record No. "+i);
-//            try {
-//                ExtHash.insert(randint);
-//            }
-//            catch (Exception e){
-//                System.out.println("Inserting: "+randint+" | Record No. "+i);
-//                e.printStackTrace();
-//                break;
-//            }
-//        }
-
-//        System.out.println(new BigInteger("10010011110000110111"));
-
-//        ExtHash.printBAT();
-//        secMem.printMap();
-//
-//        System.out.println("Total Buckets: "+getBucketCount());
-
-//        System.out.println(ExtHash.searchVal(0));
-
-//        secMem.printMap();
-
+    public static void generateData(){
         int[] dataSet1 = new int[100000];
         int[] dataSet2 = new int[100000];
 
@@ -71,6 +27,8 @@ public class launcher {
             dataSet1[i] = randint;
         }
 
+        writeDataSet(dataSet1,1);
+
         //Data Set 2
         for (int i = 0; i < 60000; i++) {
             int randint=rand.nextInt((800000 - 700000) + 1) + 700000;
@@ -81,6 +39,55 @@ public class launcher {
             dataSet2[i+60000] = randint;
         }
 
+        writeDataSet(dataSet2,2);
+    }
+
+    public static void writeDataSet(int[] dataSet,int setNo){
+        String filename="dataset"+setNo+".txt";
+        try {
+            FileWriter fw=new FileWriter(filename);
+            for(int i:dataSet){
+                fw.append(i+"\n");
+            }
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static int[] readData(int setNo){
+        String filename="dataset"+setNo+".txt";
+        FileReader fileReader = null;
+        try {
+            fileReader = new FileReader(filename);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            ArrayList<Integer> lines = new ArrayList<Integer>();
+            String line = null;
+            while ((line = bufferedReader.readLine()) != null) {
+                lines.add(Integer.valueOf(line));
+            }
+            bufferedReader.close();
+
+            int dataSet[]=new int[lines.size()];
+            for(int i=0;i<lines.size();i++){
+                dataSet[i]=lines.get(i);
+            }
+            return dataSet;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return new int[0];
+    }
+
+    public static void main(String[] args){
+//          generateData();
+
+          int[] dataSet1=readData(1);
+          int[] dataSet2=readData(2);
+
 //        System.out.println("DataSet 1:");
 //        for (int ele: dataSet1) {
 //            System.out.println(ele);
@@ -90,7 +97,12 @@ public class launcher {
 //        for (int ele: dataSet2) {
 //            System.out.println(ele);
 //        }
-        execute(dataSet2,2);
+
+        //Following lines must be run one-at-a-time to avoid synchronisation issues
+//        execute(dataSet1,1,10);
+//        execute(dataSet1,1,40);
+//        execute(dataSet2,2,10);
+        execute(dataSet2,2,40);
     }
 
 
@@ -136,8 +148,9 @@ public class launcher {
         }
     }
 
-    public static void execute(int[] dataSet, int setNo){
+    public static void execute(int[] dataSet, int setNo,int buckSize){
         int multiplier = 0;
+        CommonUtils.setBuckLength(buckSize);
         linHash=new LinearHash(buckSize,1);
 
         String ehFileName="EH_Set"+setNo+"_Buck"+buckSize+".csv";
@@ -183,7 +196,12 @@ public class launcher {
             lhSearchFW.close();
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (ArrayIndexOutOfBoundsException e){
+            e.printStackTrace();
+        } catch (NullPointerException e){
+            e.printStackTrace();
         }
-        System.out.println("Fin");
+        System.out.println("DataSet: "+setNo+", BuckSize: "+buckSize+", Fin");
     }
+
 }
