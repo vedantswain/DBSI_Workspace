@@ -1,5 +1,7 @@
 package Objects;
 
+import MyCommons.MyCommons;
+
 import java.util.ArrayList;
 
 /**
@@ -7,15 +9,33 @@ import java.util.ArrayList;
  */
 public class Buffer {
     ArrayList<Page> pageList;
-    int bufferSize;
+    int counter;
 
-    public Buffer(int bSize){
-        this.bufferSize = bSize;
-        this.pageList = new ArrayList<>(bufferSize);
+    public Buffer(){
+        this.counter = 0;
+        this.pageList = new ArrayList<>();
+    }
+
+    public boolean insertPage(Page page){
+        this.counter++;
+        if (this.counter < MyCommons.getBufferSize()){
+            return this.pageList.add(page);
+        }
+        else {
+            return false;
+        }
+    }
+
+    public boolean isBufferFull(){
+        return this.counter < MyCommons.getBufferSize();
     }
 
     public ArrayList<Page> getPageList() {
         return pageList;
+    }
+
+    public int getLastOccupiedIndex(){
+        return this.counter;
     }
 
     @Override

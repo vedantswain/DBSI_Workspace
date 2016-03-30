@@ -7,20 +7,46 @@ import java.util.ArrayList;
  */
 public class GlobalTable {
     ArrayList<Buffer> bufferList;
-    int globalTableSize;
 
-    public GlobalTable(int gTSize){
-        this.globalTableSize = gTSize;
-        this.bufferList = new ArrayList<>(globalTableSize);
+    public GlobalTable(){
+        this.bufferList = new ArrayList<>();
     }
 
-    public boolean bufferListContains(Page page){
-        for (Buffer buffer: this.bufferList){
-            ArrayList<Page> bufferPageList = buffer.getPageList();
-            if (bufferPageList.contains(page))
-                return true;
+    public void addToGlobalTable(Page page, PageTable pageTable){
+        int bufferIndex = getNextVacantBufferIndex();
+        Buffer buffer1 = this.bufferList.get(bufferIndex);
+        if (!buffer1.isBufferFull()){
+            System.out.println("Inserted in existing buffer: " + buffer1.insertPage(page));
+            pageTable.addToPageTable(page, bufferIndex);
         }
-        return false;
+        else {
+            Buffer buffer2 = new Buffer();
+            buffer2.insertPage(page);
+            System.out.println("Inserted in existing buffer: " + buffer1.insertPage(page));
+            bufferList.add(buffer2);
+            pageTable.addToPageTable(page,bufferList.size()-1);
+        }
+    }
+
+    public int getNextVacantBufferIndex(){
+        for (int i=0; i<this.bufferList.size(); ++i){
+            if(!this.bufferList.get(i).isBufferFull()){
+                return i;
+            }
+        }
+        return this.bufferList.size()-1;
+    }
+
+    public boolean bufferListContains(Page page, PageTable pageTable){
+        int bufferIndex = pageTable.getPageTableIndex(page);
+        if (bufferIndex >= 0)
+        {
+            Buffer buffer = bufferList.get(bufferIndex);
+            return (buffer.getPageList().contains(page));
+        }
+        else {
+            return false;
+        }
     }
 
 }

@@ -5,9 +5,19 @@ package Objects;
  */
 public class Page {
     String page;
+    int priority;
+    boolean belongsToLocalitySet;
 
     public Page(String page) {
         this.page = page;
+    }
+
+    public void setBelongsToLocalitySet(boolean belongsToLocalitySet) {
+        this.belongsToLocalitySet = belongsToLocalitySet;
+    }
+
+    public boolean isBelongsToLocalitySet() {
+        return belongsToLocalitySet;
     }
 
     @Override
