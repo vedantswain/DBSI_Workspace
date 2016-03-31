@@ -25,8 +25,8 @@ public class run {
             //update statistics
         }
         else if (globalFreeList.freeListContains(page)){
-            fileInstance.addToLocalitySet(page);
-            globalTable.addToGlobalTable(page, pageTable);
+            if (fileInstance.addToLocalitySet(page, globalTable, pageTable))
+                globalTable.addToGlobalTable(page, pageTable);
         }
         else{
             globalFreeList.addToFreeList(page);

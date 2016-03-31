@@ -37,6 +37,18 @@ public class GlobalTable {
         return this.bufferList.size()-1;
     }
 
+    public boolean removeFromGlobalTable(Page page, PageTable pageTable){
+        int bufferIndex = pageTable.getPageTableIndex(page);
+        Buffer buffer1 = this.bufferList.get(bufferIndex);
+        if (buffer1.removePage(page)){
+            pageTable.removeFromPageTable(page);
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
     public boolean bufferListContains(Page page, PageTable pageTable){
         int bufferIndex = pageTable.getPageTableIndex(page);
         if (bufferIndex >= 0)

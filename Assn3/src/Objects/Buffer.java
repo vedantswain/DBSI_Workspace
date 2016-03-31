@@ -9,16 +9,13 @@ import java.util.ArrayList;
  */
 public class Buffer {
     ArrayList<Page> pageList;
-    int counter;
 
     public Buffer(){
-        this.counter = 0;
         this.pageList = new ArrayList<>();
     }
 
     public boolean insertPage(Page page){
-        this.counter++;
-        if (this.counter < MyCommons.getBufferSize()){
+        if (this.pageList.size() < MyCommons.getBufferSize()){
             return this.pageList.add(page);
         }
         else {
@@ -26,8 +23,17 @@ public class Buffer {
         }
     }
 
+    public boolean removePage(Page page){
+        if (this.pageList.size() >= 0){
+            return this.pageList.remove(page);
+        }
+        else {
+            return false;
+        }
+    }
+
     public boolean isBufferFull(){
-        return this.counter < MyCommons.getBufferSize();
+        return this.pageList.size() < MyCommons.getBufferSize();
     }
 
     public ArrayList<Page> getPageList() {
@@ -35,7 +41,7 @@ public class Buffer {
     }
 
     public int getLastOccupiedIndex(){
-        return this.counter;
+        return this.pageList.size();
     }
 
     @Override

@@ -5,7 +5,7 @@ package Objects;
  */
 public class Page {
     String page;
-    int priority;
+    int timestamp;
     boolean belongsToLocalitySet;
 
     public Page(String page) {
@@ -14,6 +14,14 @@ public class Page {
 
     public void setBelongsToLocalitySet(boolean belongsToLocalitySet) {
         this.belongsToLocalitySet = belongsToLocalitySet;
+    }
+
+    public int getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(int timestamp) {
+        this.timestamp = timestamp;
     }
 
     public boolean isBelongsToLocalitySet() {

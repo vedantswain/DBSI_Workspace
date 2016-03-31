@@ -9,11 +9,15 @@ public class PageTable {
     HashMap<Page, Integer> pageMap;
 
     public PageTable(){
-        pageMap = new HashMap<>();
+        this.pageMap = new HashMap<>();
     }
 
     public void addToPageTable(Page page,int index){
-        pageMap.put(page,index);
+        this.pageMap.put(page,index);
+    }
+
+    public void removeFromPageTable(Page page){
+        this.pageMap.remove(page);
     }
 
     public int getPageTableIndex(Page page){
