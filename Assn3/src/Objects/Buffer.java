@@ -33,7 +33,8 @@ public class Buffer {
     }
 
     public boolean isBufferFull(){
-        return this.pageList.size() < MyCommons.getBufferSize();
+//        System.out.println("Buffer size: "+MyCommons.getBufferSize());
+        return this.pageList.size() > MyCommons.getBufferSize();
     }
 
     public ArrayList<Page> getPageList() {

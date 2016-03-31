@@ -5,18 +5,23 @@ package Objects;
  */
 public class Page {
     String page;
-    int timestamp;
+    long timestamp;
     boolean belongsToLocalitySet;
 
-    public Page(String page) {
+    public Page(String page, long ts) {
         this.page = page;
+        this.timestamp = ts;
     }
 
     public void setBelongsToLocalitySet(boolean belongsToLocalitySet) {
         this.belongsToLocalitySet = belongsToLocalitySet;
     }
 
-    public int getTimestamp() {
+    public String getPage() {
+        return page;
+    }
+
+    public long getTimestamp() {
         return timestamp;
     }
 
