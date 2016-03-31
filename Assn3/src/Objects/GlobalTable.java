@@ -28,7 +28,9 @@ public class GlobalTable {
 //            System.out.println("Current Buffer Index: "+bufferIndex+", occupied: "+buffer1.pageList.size());
 //            System.out.println("isBufferFull: "+buffer1.isBufferFull());
             if (!buffer1.isBufferFull()){
-                System.out.println("Inserted in existing buffer: " + buffer1.insertPage(page));
+                System.out.println("Inserted in existing buffer: " + buffer1.insertPage(page)+", page: "+
+                        page.getPage());
+//                System.out.println("existing buffer, bufferIndex: "+bufferIndex);
                 pageTable.addToPageTable(page, bufferIndex);
             }
             else {

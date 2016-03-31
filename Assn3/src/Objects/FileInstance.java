@@ -33,22 +33,26 @@ public class FileInstance {
     }
 
     public boolean addToLocalitySet(Page page, GlobalTable gTable, PageTable pTable){
+        this.localitySet.add(page);
         ++this.usedPages;
+//        System.out.println("Number of Used Pages: "+this.usedPages);
         if (this.usedPages > this.maxPages){
             if (evictPage(gTable, pTable)) {
                 this.usedPages = this.maxPages;
                 return true;
             }
-            else
+            else {
                 return false;
+            }
         }
-        else
-            return this.localitySet.add(page);
+//        System.out.println("Number of Used Pages after insertion: "+this.usedPages+", Page: "+page.getPage());
+        return true;
     }
 
     private boolean evictPage(GlobalTable globalTable, PageTable pageTable){
         //TODO: Replacement to be done
         Page evictPage = Replacement.getPageLRU(this.localitySet);
+        System.out.println("Evicting Page : " + evictPage.getPage());
         return this.localitySet.remove(evictPage) && globalTable.removeFromGlobalTable(evictPage, pageTable);
     }
 

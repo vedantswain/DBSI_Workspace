@@ -21,6 +21,7 @@ public class run {
     }
 
     private static void requestPage(Page page, FileInstance fileInstance, boolean recFlag){
+
         if (globalTable.bufferListContains(page, pageTable))
         {
             //update statistics
@@ -29,6 +30,12 @@ public class run {
             System.out.println("Page already in memory");
         }
         else if (globalFreeList.freeListContains(page)){
+//            if (fileInstance.getUsedPages()>1000){
+//                System.out.println("Exiting program, Page: "+page.getPage());
+//                return;
+//            }
+//            System.out.println("Locality Set size: "+
+//                    fileInstance.getUsedPages()+", Page: "+page.getPage());
             if (fileInstance.addToLocalitySet(page, globalTable, pageTable))
                 globalTable.addToGlobalTable(page, pageTable);
             if (!recFlag)
@@ -62,7 +69,7 @@ public class run {
         FileInstance outerInstance = new FileInstance(1);
         FileInstance innerInstance = new FileInstance(innerBlocks);
 
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < outerBlocks; i++) {
             for (int j = 0; j < innerBlocks; j++) {
                 String outerSuffix = Integer.toString(i+1);
                 Page outerPage = new Page(outerPrefix.concat(outerSuffix), System.currentTimeMillis());
