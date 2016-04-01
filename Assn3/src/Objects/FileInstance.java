@@ -10,22 +10,12 @@ import java.util.ArrayList;
 public class FileInstance {
     ArrayList<Page> localitySet;
     int maxPages;
-    int usedPages;
 //    ArrayList<PageReferenceString> pageReferenceList;
 
     public FileInstance(int maxP) {
         this.localitySet = new ArrayList<>();
         this.maxPages = maxP;
-        this.usedPages = 0;
 //        pageReferenceList = new ArrayList<>();
-    }
-
-    public int getUsedPages() {
-        return this.usedPages;
-    }
-
-    public void setUsedPages(int usedBuffers) {
-        this.usedPages = usedBuffers;
     }
 
     public boolean checkInLocalitySet(Page page){
@@ -33,18 +23,17 @@ public class FileInstance {
     }
 
     public boolean addToLocalitySet(Page page, GlobalTable gTable, PageTable pTable){
-        this.localitySet.add(page);
-        ++this.usedPages;
 //        System.out.println("Number of Used Pages: "+this.usedPages);
-        if (this.usedPages > this.maxPages){
+        if (this.localitySet.size() >= this.maxPages){
             if (evictPage(gTable, pTable)) {
-                this.usedPages = this.maxPages;
+                this.localitySet.add(page);
                 return true;
             }
             else {
                 return false;
             }
         }
+        this.localitySet.add(page);
 //        System.out.println("Number of Used Pages after insertion: "+this.usedPages+", Page: "+page.getPage());
         return true;
     }
@@ -52,6 +41,7 @@ public class FileInstance {
     private boolean evictPage(GlobalTable globalTable, PageTable pageTable){
         //TODO: Replacement to be done
         Page evictPage = Replacement.getPageLRU(this.localitySet);
+//        Page evictPage = Replacement.getPageMRU(this.localitySet);
         System.out.println("Evicting Page : " + evictPage.getPage());
         return this.localitySet.remove(evictPage) && globalTable.removeFromGlobalTable(evictPage, pageTable);
     }

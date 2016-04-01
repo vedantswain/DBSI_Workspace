@@ -43,4 +43,19 @@ public class MyCommons {
     public static int getBufferSize() {
         return BUFFER_SIZE;
     }
+
+    public static float getProduct(int n, float d, int k){
+        float res = 1;
+        for (int i = 1; i <= k; i++) {
+            res = res * (((n*d)-i+1)/(n-i+1));
+//            System.out.println("deno: "+(n-i+1)+", d="+d);
+        }
+        return res;
+    }
+
+    public static int getYaosValue(int m, int n, int k){
+        float d = (float) (1 - (1.0/m));
+//        System.out.println("Product: "+getProduct(n, d, k));
+        return (int) Math.ceil(m * (1 - getProduct(n, d, k)));
+    }
 }
