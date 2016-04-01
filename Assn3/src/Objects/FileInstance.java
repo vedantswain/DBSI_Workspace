@@ -42,11 +42,7 @@ public class FileInstance {
         //TODO: Replacement to be done
         Page evictPage = Replacement.getPageLRU(this.localitySet);
 //        Page evictPage = Replacement.getPageMRU(this.localitySet);
-        System.out.println("Evicting Page : " + evictPage.getPage());
+//        System.out.println("Evicting Page : " + evictPage.getPage());
         return this.localitySet.remove(evictPage) && globalTable.removeFromGlobalTable(evictPage, pageTable);
     }
-
-//    public void addToPageReferenceList(PageReferenceString prString){
-//        pageReferenceList.add(prString);
-//    }
 }

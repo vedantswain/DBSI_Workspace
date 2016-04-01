@@ -25,7 +25,7 @@ public class Page {
         return timestamp;
     }
 
-    public void setTimestamp(int timestamp) {
+    public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
 

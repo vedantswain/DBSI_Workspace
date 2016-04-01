@@ -25,7 +25,7 @@ public class PageTable {
             return pageMap.get(page.getPage());
         }
         catch (NullPointerException ex){
-            System.out.println("Page not found");
+//            System.out.println("Page not found");
             return -1;
         }
     }
